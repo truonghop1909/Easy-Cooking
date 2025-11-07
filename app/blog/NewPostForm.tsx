@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState } from 'react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { Blog } from '../types/blog'

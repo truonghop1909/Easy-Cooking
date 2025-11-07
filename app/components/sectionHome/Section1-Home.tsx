@@ -1,3 +1,4 @@
+"use client";
 import { FaArrowRight } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 
