@@ -28,9 +28,9 @@ export const usersData = [
   },
   {
     id: "2",
-    name: "Hoàng Quỳnh",
+    name: "Hoàng Tài",
     username: "emmadee",
-    avatar: "/avatarHoangQuynh.jpg",
+    avatar: "/avatarHoangTai.jpg",
     location: "Đà Lạt, Việt Nam",
     bio: "Vegan chef and blogger. Sharing love through plant-based recipes.",
     followers: 980,

@@ -1,21 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/app/api/_mockdb";
-
-// Kiểu comment tường minh
-interface Comment {
-  comment_id: number;
-  content_type: "recipe" | "blog";
-  content_id: number;
-  user_id: number;
-  parent_id: number | null;
-  content: string;
-  created_at: string;
-}
+import { Comment } from "@/app/types/comment"; // ✅ Dùng chung interface
 
 // 🟢 LẤY DANH SÁCH COMMENT THEO BÀI VIẾT
 export async function GET(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ type?: string; id: string }> } // 👈 type có thể undefined
 ) {
   const { id } = await context.params;
   const blogId = Number(id);
@@ -42,7 +32,7 @@ export async function GET(
 // 🟢 THÊM COMMENT MỚI
 export async function POST(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ type?: string; id: string }> }
 ) {
   const { id } = await context.params;
   const blogId = Number(id);

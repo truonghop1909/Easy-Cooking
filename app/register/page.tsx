@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const { login } = useAuth() // dùng login() để lưu user ngay sau đăng ký
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!name || !email || !password) {
@@ -26,7 +26,7 @@ export default function RegisterPage() {
     localStorage.setItem('registeredUser', JSON.stringify(newUser))
 
     // Tự động đăng nhập ngay sau khi đăng ký
-    login(email)
+    await login(email, password)
 
     alert('Đăng ký thành công!')
     router.push('/')
