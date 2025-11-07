@@ -2,29 +2,30 @@
 import { FaShareAlt, FaBookmark, FaStar } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import Image from "next/image";
+import { db } from "@/app/api/_mockdb"; // ✅ import data trực tiếp
 
-interface Author {
-  name: string;
-  avatar: string;
-  date: string;
-}
+export default function Section1Recipe({ recipeId = 1 }: { recipeId?: number }) {
+  // 🔹 Lấy công thức theo ID (mặc định lấy ID = 1)
+  const recipe = db.recipes.find((r) => r.recipe_id === recipeId);
 
-interface Stats {
-  rating: number;
-  comments: number;
-  trend: number;
-}
+  if (!recipe) {
+    return <p className="text-center text-gray-500 mt-10">Không tìm thấy công thức</p>;
+  }
 
-interface RecipeHeaderProps {
-  title: string;
-  author: Author;
-  stats: Stats;
-}
+  // 🔹 Lấy thông tin tác giả
+  const author = db.users.find((u) => u.user_id === recipe.author_id);
 
-export default function Section1Recipe({ title, author, stats }: RecipeHeaderProps) {
+  const authorData = {
+    name: author?.full_name || "Ẩn danh",
+    avatar: author?.avatar_url || "/avatarTruongHop.jpg",
+    date: new Date(recipe.created_at).toLocaleDateString("vi-VN"),
+  };
+
+  const stats = recipe.stats;
+
   return (
     <header className="border-b pb-5 mb-10">
-      {/* Trend + Action */}
+      {/* === Trend + Action === */}
       <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
         <div className="flex items-center gap-2">
           <FaArrowTrendUp className="text-gray-800" />
@@ -36,22 +37,22 @@ export default function Section1Recipe({ title, author, stats }: RecipeHeaderPro
         </div>
       </div>
 
-      {/* Title */}
+      {/* === Title === */}
       <h1 className="text-[42px] font-extrabold text-gray-900 mb-5 leading-tight">
-        {title}
+        {recipe.title}
       </h1>
 
-      {/* Author Info */}
+      {/* === Author Info === */}
       <div className="flex items-center gap-3 text-sm text-gray-700">
         <Image
-          src={author.avatar}
-          alt={author.name}
+          src={authorData.avatar}
+          alt={authorData.name}
           width={34}
           height={34}
           className="rounded-full object-cover border border-gray-200"
         />
-        <span className="font-medium">{author.name}</span>
-        <span className="text-gray-500">• {author.date}</span>
+        <span className="font-medium">{authorData.name}</span>
+        <span className="text-gray-500">• {authorData.date}</span>
         <span className="text-gray-500">• {stats.comments} comments</span>
 
         {/* Rating */}

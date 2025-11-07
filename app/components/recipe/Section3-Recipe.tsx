@@ -1,30 +1,57 @@
 "use client";
 import { useState } from "react";
+import { db } from "@/app/api/_mockdb"; // ✅ import mock data
 
-export default function Section3Recipe({ ingredients, prepTime, cookTime, serves }: any) {
+export default function Section3Recipe({ recipeId = 1 }: { recipeId?: number }) {
+  // 🔹 Lấy công thức theo ID
+  const recipe = db.recipes.find((r) => r.recipe_id === recipeId);
+
+  // 🔹 Nếu không tìm thấy công thức
+  if (!recipe) {
+    return (
+      <p className="text-center text-gray-500 mt-10">
+        Không tìm thấy công thức (recipeId: {recipeId})
+      </p>
+    );
+  }
+
+  // 🔹 Lấy dữ liệu từ recipe
+  const { ingredients = [], prep_time, cook_time, serves } = recipe;
   const [checked, setChecked] = useState<string[]>([]);
 
   const toggleCheck = (item: string) => {
     setChecked((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+      prev.includes(item)
+        ? prev.filter((i) => i !== item)
+        : [...prev, item]
     );
   };
 
+  // 🔹 Nếu không có ingredients (data trống)
+  if (!Array.isArray(ingredients) || ingredients.length === 0) {
+    return (
+      <p className="text-center text-gray-500 mt-10">
+        Không có dữ liệu nguyên liệu cho công thức này.
+      </p>
+    );
+  }
+
+  // ✅ Render UI
   return (
     <section className="space-y-8">
-      {/* Info row */}
+      {/* === Info row === */}
       <div className="flex flex-wrap items-center gap-6 border-b border-gray-200 pb-4 text-[13px] text-gray-700">
         <div>
           <p className="font-semibold uppercase tracking-wide">Prep Time</p>
-          <p>{prepTime}</p>
+          <p>{prep_time || "N/A"}</p>
         </div>
         <div>
           <p className="font-semibold uppercase tracking-wide">Cook Time</p>
-          <p>{cookTime}</p>
+          <p>{cook_time || "N/A"}</p>
         </div>
         <div>
           <p className="font-semibold uppercase tracking-wide">Servings</p>
-          <p>{serves}</p>
+          <p>{serves || "N/A"}</p>
         </div>
         <button
           onClick={() => window.print()}
@@ -34,6 +61,7 @@ export default function Section3Recipe({ ingredients, prepTime, cookTime, serves
         </button>
       </div>
 
+      {/* === Ingredients === */}
       <h2 className="text-2xl font-bold mb-4">Ingredients</h2>
 
       {ingredients.map((group: any, idx: number) => (
@@ -53,7 +81,9 @@ export default function Section3Recipe({ ingredients, prepTime, cookTime, serves
                       : "border-gray-400"
                   }`}
                 >
-                  {checked.includes(item) && <span className="text-[12px]">✔</span>}
+                  {checked.includes(item) && (
+                    <span className="text-[12px]">✔</span>
+                  )}
                 </span>
                 <span
                   className={`text-[15px] ${

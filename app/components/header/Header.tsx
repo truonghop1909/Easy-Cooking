@@ -1,31 +1,35 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { MenuItem } from "./MenuItem";
-import { FaSearch, FaBars } from "react-icons/fa";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { Search } from "../search/Search";
-import { useClickOutside } from "@/app/hooks/useClickOutside";
-import { UserMenu } from "./UserMenu";
+import Link from 'next/link'
+import Image from 'next/image'
+import { FaSearch, FaBars } from 'react-icons/fa'
+import { useRef, useState } from 'react'
+import { useClickOutside } from '@/app/hooks/useClickOutside'
+import { useAuth } from '@/app/contexts/AuthContext'
+import { Search } from '../search/Search'
+import { UserMenu } from './UserMenu'
+import { MenuItem } from './MenuItem'
 
 export const Header = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // đóng menu khi click ra ngoài
-  useClickOutside(userMenuRef, () => setIsUserMenuOpen(false));
-  useClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false));
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+
+  const { user } = useAuth()
+
+  // Đóng menu khi click ra ngoài
+  useClickOutside(userMenuRef, () => setIsUserMenuOpen(false))
+  useClickOutside(mobileMenuRef, () => setIsMobileMenuOpen(false))
 
   const menu = [
-    { title: "Home", link: "/" },
-    { title: "Categories", link: "/categories" },
-    { title: "Blog", link: "/blog" },
-    { title: "About us", link: "/about-us" },
-  ];
+    { title: 'Home', link: '/' },
+    { title: 'Categories', link: '/categories' },
+    { title: 'Blog', link: '/blog' },
+    { title: 'About us', link: '/about-us' },
+  ]
 
   return (
     <>
@@ -60,23 +64,40 @@ export const Header = () => {
                 <FaSearch />
               </button>
 
-              {/* Avatar */}
-              <div className="relative" ref={userMenuRef}>
-                <button onClick={() => setIsUserMenuOpen((p) => !p)}>
-                  <Image
-                    src="/avatarTruongHop.jpg"
-                    alt="user"
-                    width={40}
-                    height={40}
-                    className="rounded-full border border-gray-300 object-cover"
-                    quality={100}
-                  />
-                </button>
+              {/* Avatar hoặc nút login/register */}
+              {user ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button onClick={() => setIsUserMenuOpen((p) => !p)}>
+                    <Image
+                      src={user.avatar_url}
+                      alt={user.username}
+                      width={40}
+                      height={40}
+                      className="rounded-full border border-gray-300 object-cover"
+                      quality={100}
+                    />
+                  </button>
 
-                {isUserMenuOpen && (
-                  <UserMenu onClose={() => setIsUserMenuOpen(false)} />
-                )}
-              </div>
+                  {isUserMenuOpen && (
+                    <UserMenu onClose={() => setIsUserMenuOpen(false)} />
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/login"
+                    className="text-sm bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="text-sm border border-orange-500 text-orange-500 px-4 py-2 rounded-lg hover:bg-orange-50"
+                  >
+                    Đăng ký
+                  </Link>
+                </div>
+              )}
 
               {/* === BURGER MENU cho mobile === */}
               <div className="relative block lg:hidden" ref={mobileMenuRef}>
@@ -102,6 +123,30 @@ export const Header = () => {
                           </Link>
                         </li>
                       ))}
+
+                      {/* Nếu user chưa đăng nhập → thêm nút đăng nhập + đăng ký */}
+                      {!user && (
+                        <>
+                          <li>
+                            <Link
+                              href="/login"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block px-4 py-2 rounded-md text-orange-600 hover:bg-orange-50 font-semibold"
+                            >
+                              Đăng nhập
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href="/register"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block px-4 py-2 rounded-md text-gray-700 hover:bg-orange-50 font-semibold"
+                            >
+                              Đăng ký
+                            </Link>
+                          </li>
+                        </>
+                      )}
                     </ul>
                   </div>
                 )}
@@ -113,5 +158,5 @@ export const Header = () => {
 
       {isSearchOpen && <Search onClose={() => setIsSearchOpen(false)} />}
     </>
-  );
-};
+  )
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "./components/header/Header";
 import { Footer } from "./components/footer/Footer";
+import { AuthProvider } from "./contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "cooking_app",
@@ -16,13 +17,13 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="bg-[#ffffff]">
-        <div className="">
+        <AuthProvider>
           <Header/>
-          <main>
-            {children}
-          </main>
+            <main>
+              {children}
+            </main>
           <Footer/>
-        </div>
+        </AuthProvider>
       </body>
     </html>
   );

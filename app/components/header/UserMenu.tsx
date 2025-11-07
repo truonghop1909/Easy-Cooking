@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import Link from "next/link";
 import {
@@ -11,27 +11,51 @@ import {
   FiUpload,
   FiRepeat,
 } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface UserMenuProps {
   onClose: () => void;
 }
 
 export const UserMenu = ({ onClose }: UserMenuProps) => {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
   const handleLogout = () => {
-    console.log("Logging out...");
+    logout();
     onClose();
+    router.push("/login");
   };
+
+  // 🔸 Lấy chữ cái đầu nếu không có avatar
+  const initials = user?.full_name
+    ? user.full_name.charAt(0).toUpperCase()
+    : "U";
 
   return (
     <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
       {/* === USER INFO === */}
       <div className="flex items-center gap-3 p-4 border-b border-gray-100">
-        <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
-          H
-        </div>
+        {/* ✅ Nếu có avatar_url thì hiển thị ảnh thật */}
+        {user?.avatar_url ? (
+          <img
+            src={user.avatar_url}
+            alt="Avatar"
+            className="w-10 h-10 rounded-full object-cover border border-gray-200"
+          />
+        ) : (
+          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+            {initials}
+          </div>
+        )}
+
         <div>
-          <div className="font-semibold">Hợp Trương</div>
-          <div className="text-sm text-gray-500">@cook_28712694</div>
+          <div className="font-semibold">{user?.full_name || "Người dùng"}</div>
+          <div className="text-sm text-gray-500">@{user?.username || "username"}</div>
+          <div className="text-xs text-gray-400">
+            {user?.role === "admin" ? "Quản trị viên" : "Thành viên"}
+          </div>
         </div>
       </div>
 
