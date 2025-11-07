@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/app/api/_mockdb";
 
-// Lấy danh sách like của bài hoặc công thức
+// 🟢 LẤY DANH SÁCH LIKE
 export async function GET(
   req: Request,
-  { params }: { params: { type: "recipe" | "blog"; id: string } }
+  context: { params: Promise<{ type: "recipe" | "blog"; id: string }> }
 ) {
-  const { type, id } = await params;
+  const { type, id } = await context.params; // ✅ phải await
   const contentId = Number(id);
 
   const likes = db.likes.filter(
@@ -16,18 +16,18 @@ export async function GET(
   return NextResponse.json(
     {
       count: likes.length,
-      likes: likes,
+      likes,
     },
     { status: 200 }
   );
 }
 
-// Thêm / bỏ like
+// 🟠 THÊM / BỎ LIKE
 export async function POST(
   req: Request,
-  { params }: { params: { type: "recipe" | "blog"; id: string } }
+  context: { params: Promise<{ type: "recipe" | "blog"; id: string }> }
 ) {
-  const { type, id } = await params;
+  const { type, id } = await context.params; // ✅ chỗ này cũng vậy
   const contentId = Number(id);
   const { user_id } = await req.json();
 
@@ -42,10 +42,10 @@ export async function POST(
   );
 
   if (existing) {
-    // Nếu đã like => bỏ like
+    // ❌ Nếu đã like => bỏ like
     db.likes = db.likes.filter((l) => l.like_id !== existing.like_id);
   } else {
-    // Nếu chưa like => thêm like
+    // ✅ Nếu chưa like => thêm like
     db.likes.push({
       like_id: db.likes.length + 1,
       content_type: type,
@@ -61,7 +61,7 @@ export async function POST(
 
   return NextResponse.json(
     {
-      liked: !existing, // true nếu mới like, false nếu bỏ like
+      liked: !existing, // true = vừa like, false = bỏ like
       count: updated.length,
       likes: updated,
     },

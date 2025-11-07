@@ -4,9 +4,9 @@ import { db } from "../../_mockdb";
 // ✅ Lấy thông tin user theo ID
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id } = await context.params; // ✅ phải "await" vì params là Promise
   const userId = Number(id);
 
   const user = db.users.find((u) => u.user_id === userId);
