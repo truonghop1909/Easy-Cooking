@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface Ingredient {
   section: string;
@@ -24,6 +26,9 @@ interface RecipeForm {
 }
 
 export default function CreateRecipePage() {
+  const router = useRouter();
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState<RecipeForm>({
     title: "",
     description: "",
@@ -34,6 +39,8 @@ export default function CreateRecipePage() {
     ingredients: [{ section: "", items: [""] }],
     instructions: [{ step: "", image: "" }],
   });
+
+  const [loading, setLoading] = useState(false);
 
   // 🧩 Hàm thay đổi field chính
   const handleChange = (field: keyof RecipeForm, value: any) => {
@@ -78,8 +85,11 @@ export default function CreateRecipePage() {
     });
   };
 
-  // 📸 Upload ảnh bước thực hiện
-  const handleStepImageUpload = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+  // 📸 Upload ảnh bước thực hiện (local preview)
+  const handleStepImageUpload = (
+    index: number,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
@@ -87,18 +97,42 @@ export default function CreateRecipePage() {
     }
   };
 
-  // 📨 Gửi form
-  const handleSubmit = (e: FormEvent) => {
+  // 🚀 Gửi form
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Recipe submitted:", formData);
-    alert("✅ Công thức đã được gửi đi (xem log console)");
+
+    if (!formData.title.trim()) return alert("Vui lòng nhập tên món ăn!");
+    if (!user) return alert("Bạn cần đăng nhập để đăng công thức!");
+
+    try {
+      setLoading(true);
+      const res = await fetch("/api/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          author_id: user.user_id,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Lỗi khi đăng công thức");
+
+      const newRecipe = await res.json();
+      alert("✅ Đã đăng công thức thành công!");
+      router.push(`/recipes/${newRecipe.slug || newRecipe.recipe_id}`);
+    } catch (err) {
+      console.error(err);
+      alert("❌ Gửi thất bại, vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 🍽️ Render form
   return (
     <section className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">
-        Đăng tải công thức mới
+        🧁 Đăng tải công thức mới
       </h1>
 
       <form
@@ -162,7 +196,7 @@ export default function CreateRecipePage() {
           </div>
         </div>
 
-        {/* 🖼️ Ảnh đại diện món ăn */}
+        {/* 🖼️ Ảnh đại diện */}
         <div>
           <label className="block font-medium mb-2">Ảnh minh họa (URL)</label>
           <input
@@ -222,7 +256,9 @@ export default function CreateRecipePage() {
               <input
                 type="text"
                 value={inst.step}
-                onChange={(e) => handleInstructionChange(index, "step", e.target.value)}
+                onChange={(e) =>
+                  handleInstructionChange(index, "step", e.target.value)
+                }
                 placeholder={`Bước ${index + 1}`}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 mb-2"
               />
@@ -254,9 +290,10 @@ export default function CreateRecipePage() {
         <div className="pt-6 border-t border-gray-100">
           <button
             type="submit"
-            className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition"
+            disabled={loading}
+            className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition disabled:opacity-70"
           >
-            Đăng công thức
+            {loading ? "Đang đăng..." : "Đăng công thức"}
           </button>
         </div>
       </form>

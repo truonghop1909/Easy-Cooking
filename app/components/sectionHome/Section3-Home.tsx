@@ -1,14 +1,50 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { CategoryItem } from "../item/CategoryItem";
 
+interface Category {
+  category_id: number;
+  name: string;
+  image_url: string;
+}
 
 export default function Section3Home() {
-  const categories = [
-    { name: "Pasta", image: "/banner01.jpg", },
-    { name: "Pizza", image: "/banner01.jpg", },
-    { name: "Vegan", image: "/banner01.jpg", },
-    { name: "Desserts", image: "/banner01.jpg" },
-    { name: "Smoothies", image: "/banner01.jpg", }
-  ];
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 🔹 Lấy danh mục từ DB mock qua API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories", { cache: "no-store" });
+        if (!res.ok) throw new Error("Không thể tải danh mục");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("❌ Lỗi tải danh mục:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="max-w-6xl mx-auto px-4 py-12 text-center text-gray-500">
+        Đang tải danh mục...
+      </section>
+    );
+  }
+
+  if (categories.length === 0) {
+    return (
+      <section className="max-w-6xl mx-auto px-4 py-12 text-center text-gray-500">
+        Hiện chưa có danh mục nào.
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-12 text-center">
@@ -17,8 +53,12 @@ export default function Section3Home() {
       </h2>
 
       <div className="grid sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
-        {categories.map((item, index) => (
-          <CategoryItem key={index} {...item} />
+        {categories.map((item) => (
+          <CategoryItem
+            key={item.category_id}
+            name={item.name}
+            image={item.image_url || "/banner01.jpg"}
+          />
         ))}
       </div>
     </section>

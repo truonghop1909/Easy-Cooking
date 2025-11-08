@@ -1,27 +1,41 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import RecipeCard from "../item/RecipeCard";
 
-interface Section6HomeProps {
-  title?: string; // tiêu đề động
-  recipes?: { title: string; image: string }[]; // cho phép truyền mảng khác
+interface Recipe {
+  recipe_id: number;
+  title: string;
+  image_url: string;
+  slug?: string;
 }
 
-export default function Section6Home({
-  title = "Latest Recipes",
-  recipes = [
-    { title: "Caramel Strawberry Milkshake", image: "/banner01.jpg" },
-    { title: "Cashew Vegan Rice", image: "/banner01.jpg" },
-    { title: "Smoked Salmon Salad Sandwich", image: "/banner01.jpg" },
-    { title: "Salmon in Creamy Sun Dried Tomato Sauce", image: "/banner01.jpg" },
-    { title: "Healthy Jam Waffle Breakfast", image: "/banner01.jpg" },
-    { title: "Chocolate and Banana Jar Cake", image: "/banner01.jpg" },
-    { title: "Caramel Blueberry Scones", image: "/banner01.jpg" },
-    { title: "Blueberry Carrot Cake", image: "/banner01.jpg" },
-    { title: "Vegan Cauliflower Salad", image: "/banner01.jpg" },
-    { title: "Roasted Red Pepper Soup", image: "/banner01.jpg" },
-    { title: "Eggs and Avocado Toast", image: "/banner01.jpg" },
-    { title: "Pork Shoulder Cashew Noodles", image: "/banner01.jpg" },
-  ],
-}: Section6HomeProps) {
+interface Section6HomeProps {
+  title?: string;
+}
+
+export default function Section6Home({ title = "Latest Recipes" }: Section6HomeProps) {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // 🟢 Fetch toàn bộ công thức
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const res = await fetch("/api/recipes", { cache: "no-store" });
+        if (!res.ok) throw new Error("Không thể tải công thức");
+        const data = await res.json();
+        setRecipes(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("❌ Lỗi tải recipes:", err);
+      }
+    };
+    fetchRecipes();
+  }, []);
+
+  const handleLoadMore = () => setVisibleCount((prev) => prev + 8);
+
   return (
     <section className="container mx-auto px-4 py-16">
       {/* Tiêu đề */}
@@ -29,19 +43,39 @@ export default function Section6Home({
         {title}
       </h2>
 
-      {/* Grid món ăn */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {recipes.map((r, i) => (
-          <RecipeCard key={i} title={r.title} image={r.image} />
-        ))}
-      </div>
+      {/* Grid công thức */}
+      {recipes.length > 0 ? (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            {recipes.slice(0, visibleCount).map((r) => (
+              <Link
+                key={r.recipe_id}
+                href={`/recipes/${r.slug || r.recipe_id}`}
+                className="block"
+              >
+                <RecipeCard
+                  title={r.title}
+                  image={r.image_url || "/banner01.jpg"}
+                />
+              </Link>
+            ))}
+          </div>
 
-      {/* Nút Load More */}
-      <div className="flex justify-center mt-10">
-        <button className="border border-gray-300 px-6 py-2 rounded-md text-gray-800 hover:bg-gray-50 transition">
-          Load More
-        </button>
-      </div>
+          {/* Nút Load More */}
+          {visibleCount < recipes.length && (
+            <div className="flex justify-center mt-10">
+              <button
+                onClick={handleLoadMore}
+                className="border border-gray-300 px-6 py-2 rounded-md text-gray-800 hover:bg-gray-50 transition"
+              >
+                Load More
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="text-gray-500 text-center">Không có công thức nào để hiển thị.</p>
+      )}
     </section>
   );
 }
