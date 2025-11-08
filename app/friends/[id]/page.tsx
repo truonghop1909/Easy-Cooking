@@ -1,24 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
-import { db } from '@/app/api/_mockdb'; // ✅ lấy từ mockdb
+import { db } from '@/app/api/_mockdb';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { FaUserPlus, FaUserCheck, FaRegHeart } from 'react-icons/fa';
 
 export default function FriendDetailPage() {
   const params = useParams<{ id: string }>();
-  const userId = Number(params.id);
-  const user = db.users.find((u) => u.user_id === userId);
+  const friendId = Number(params.id);
+  const { user } = useAuth(); // 🟢 user hiện tại (đăng nhập)
+  const friend = db.users.find((u) => u.user_id === friendId);
 
-  if (!user) return notFound();
-
-  // ✅ Lọc danh sách công thức của user
-  const userRecipes = db.recipes.filter((r) => r.author_id === userId);
+  if (!friend) return notFound();
 
   const [isFriend, setIsFriend] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+
+  // ✅ Kiểm tra trong db xem có là bạn bè không
+  useEffect(() => {
+    if (!user) return;
+
+    const relation = db.friends.find(
+      (f) =>
+        f.status === 'accepted' &&
+        ((f.user_id === user.user_id && f.friend_id === friendId) ||
+          (f.friend_id === user.user_id && f.user_id === friendId))
+    );
+
+    setIsFriend(!!relation);
+  }, [user, friendId]);
+
+  // ✅ Lấy công thức người bạn
+  const userRecipes = db.recipes.filter((r) => r.author_id === friendId);
 
   return (
     <section className="container mx-auto px-4 py-12">
@@ -26,8 +42,8 @@ export default function FriendDetailPage() {
       <div className="flex flex-col md:flex-row md:items-center gap-8 mb-10">
         <div className="flex-shrink-0">
           <Image
-            src={user.avatar_url}
-            alt={user.full_name}
+            src={friend.avatar_url}
+            alt={friend.full_name}
             width={120}
             height={120}
             className="rounded-full object-cover border border-gray-300"
@@ -35,56 +51,57 @@ export default function FriendDetailPage() {
         </div>
 
         <div className="flex-1">
-          <h1 className="text-3xl font-semibold">{user.full_name}</h1>
-          <p className="text-gray-500">@{user.username}</p>
-          <p className="mt-3 text-gray-700">{user.bio}</p>
+          <h1 className="text-3xl font-semibold">{friend.full_name}</h1>
+          <p className="text-gray-500">@{friend.username}</p>
+          <p className="mt-3 text-gray-700">{friend.bio}</p>
 
-          {/* Thông tin thêm */}
           <div className="flex gap-6 mt-4 text-sm text-gray-600">
             <span>
-              <strong>{user.email_verified ? '✔️' : '❌'}</strong> Xác minh email
+              <strong>{friend.email_verified ? '✔️' : '❌'}</strong> Xác minh email
             </span>
             <span>
-              <strong>{user.is_active ? '🟢' : '🔴'}</strong> Trạng thái
+              <strong>{friend.is_active ? '🟢' : '🔴'}</strong> Trạng thái
             </span>
             <span>
-              Vai trò: <strong>{user.role}</strong>
+              Vai trò: <strong>{friend.role}</strong>
             </span>
           </div>
 
-          {/* Nút hành động */}
-          <div className="flex gap-4 mt-6">
-            <button
-              onClick={() => setIsFriend(!isFriend)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-white ${
-                isFriend
-                  ? 'bg-gray-400 hover:bg-gray-500'
-                  : 'bg-orange-500 hover:bg-orange-600'
-              } transition`}
-            >
-              {isFriend ? <FaUserCheck /> : <FaUserPlus />}
-              {isFriend ? 'Đã là bạn' : 'Kết bạn'}
-            </button>
+          {/* ✅ Nút kết bạn / đã là bạn */}
+          {user && user.user_id !== friendId && (
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => setIsFriend(!isFriend)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-white ${
+                  isFriend
+                    ? 'bg-gray-400 hover:bg-gray-500'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                } transition`}
+              >
+                {isFriend ? <FaUserCheck /> : <FaUserPlus />}
+                {isFriend ? 'Đã là bạn' : 'Kết bạn'}
+              </button>
 
-            <button
-              onClick={() => setIsFollowing(!isFollowing)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md border transition ${
-                isFollowing
-                  ? 'border-orange-500 text-orange-500'
-                  : 'border-gray-300 text-gray-700'
-              }`}
-            >
-              <FaRegHeart />
-              {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
-            </button>
-          </div>
+              <button
+                onClick={() => setIsFollowing(!isFollowing)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md border transition ${
+                  isFollowing
+                    ? 'border-orange-500 text-orange-500'
+                    : 'border-gray-300 text-gray-700'
+                }`}
+              >
+                <FaRegHeart />
+                {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ======= Phần công thức nấu ăn ======= */}
+      {/* ======= Công thức nấu ăn ======= */}
       <div className="border-t border-gray-200 pt-10">
         <h2 className="text-2xl font-semibold mb-6">
-          Công thức của {user.full_name.split(' ')[0]}
+          Công thức của {friend.full_name.split(' ')[0]}
         </h2>
 
         {userRecipes.length === 0 ? (
