@@ -1,6 +1,6 @@
 export interface Blog {
   blog_id: number;
-  author_id: number; // 🔗 liên kết với user_id trong User
+  author_id: number;
   title: string;
   slug: string;
   content: string;
@@ -8,6 +8,8 @@ export interface Blog {
   tags: string[];
   stats: {
     views: number;
+    likes: number;
+    comments: number;
   };
   created_at: string;
   updated_at: string;

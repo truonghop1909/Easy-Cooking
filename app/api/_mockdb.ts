@@ -30,7 +30,7 @@ export const db: DB = {
         "Buổi sáng bận rộn nhưng vẫn muốn ăn ngon? Dưới đây là 5 mẹo giúp bạn chuẩn bị bữa sáng chỉ trong 10 phút!",
       image_url: "https://picsum.photos/seed/blog-1/800/600",
       tags: ["Breakfast", "Tips", "Quick Meals"],
-      stats: { views: 320 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-01T09:00:00Z",
       updated_at: "2025-09-01T09:00:00Z",
     },
@@ -43,7 +43,7 @@ export const db: DB = {
         "Chè dưỡng da không chỉ ngon mà còn tốt cho sức khỏe. Hãy cùng thử công thức đặc biệt dưới đây!",
       image_url: "https://picsum.photos/seed/blog-2/800/600",
       tags: ["Dessert", "Healthy"],
-      stats: { views: 580 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-05T10:00:00Z",
       updated_at: "2025-09-05T10:00:00Z",
     },
@@ -56,7 +56,7 @@ export const db: DB = {
         "Một bức ảnh đồ ăn ngon có thể khiến người xem muốn nếm thử ngay. Dưới đây là một vài kỹ thuật ánh sáng cơ bản.",
       image_url: "https://picsum.photos/seed/blog-3/800/600",
       tags: ["Photography", "Tips"],
-      stats: { views: 880 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-10T15:00:00Z",
       updated_at: "2025-09-10T15:00:00Z",
     },
@@ -69,7 +69,7 @@ export const db: DB = {
         "Salad là món ăn nhẹ, giúp thanh lọc cơ thể và cung cấp nhiều chất xơ. Dưới đây là 3 công thức salad yêu thích.",
       image_url: "https://picsum.photos/seed/blog-4/800/600",
       tags: ["Salad", "Healthy"],
-      stats: { views: 670 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-15T09:30:00Z",
       updated_at: "2025-09-15T09:30:00Z",
     },
@@ -82,7 +82,7 @@ export const db: DB = {
         "Pancake là món ăn sáng phổ biến, chỉ với vài mẹo nhỏ bạn có thể làm được bánh mềm xốp và thơm ngon.",
       image_url: "https://picsum.photos/seed/blog-5/800/600",
       tags: ["Breakfast", "Baking"],
-      stats: { views: 520 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-17T08:15:00Z",
       updated_at: "2025-09-17T08:15:00Z",
     },
@@ -95,7 +95,7 @@ export const db: DB = {
         "Chỉ cần vài nguyên liệu đơn giản, bạn có thể tự làm kem tại nhà mà không cần máy làm kem!",
       image_url: "https://picsum.photos/seed/blog-6/800/600",
       tags: ["Dessert", "DIY"],
-      stats: { views: 740 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-20T11:00:00Z",
       updated_at: "2025-09-20T11:00:00Z",
     },
@@ -108,7 +108,7 @@ export const db: DB = {
         "Cắt tỉa rau củ là một nghệ thuật. Hãy cùng học cách tạo nên những món ăn đẹp mắt mà không tốn nhiều thời gian.",
       image_url: "https://picsum.photos/seed/blog-7/800/600",
       tags: ["Skills", "Presentation"],
-      stats: { views: 960 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-23T14:00:00Z",
       updated_at: "2025-09-23T14:00:00Z",
     },
@@ -121,7 +121,7 @@ export const db: DB = {
         "Bạn có biết cách bảo quản thực phẩm đúng cách sẽ giúp giữ nguyên dinh dưỡng và tránh lãng phí?",
       image_url: "https://picsum.photos/seed/blog-8/800/600",
       tags: ["Tips", "Storage"],
-      stats: { views: 480 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-25T09:00:00Z",
       updated_at: "2025-09-25T09:00:00Z",
     },
@@ -134,7 +134,7 @@ export const db: DB = {
         "Cách bày trí món ăn ảnh hưởng rất nhiều đến cảm nhận của thực khách. Hãy thử những tips này!",
       image_url: "https://picsum.photos/seed/blog-9/800/600",
       tags: ["Art", "Plating"],
-      stats: { views: 890 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-28T10:20:00Z",
       updated_at: "2025-09-28T10:20:00Z",
     },
@@ -147,7 +147,7 @@ export const db: DB = {
         "Món chay không hề nhạt nhẽo! Dưới đây là 3 món chay dễ làm, mát lành và bổ dưỡng.",
       image_url: "https://picsum.photos/seed/blog-10/800/600",
       tags: ["Vegan", "Healthy"],
-      stats: { views: 620 },
+      stats: { views: 320, likes: 0, comments: 0 }, // ✅ sửa đây
       created_at: "2025-09-30T12:00:00Z",
       updated_at: "2025-09-30T12:00:00Z",
     },
@@ -175,6 +175,7 @@ export const db: DB = {
         tags: tagSet,
         stats: {
           views: 200 + Math.floor(Math.random() * 900),
+          likes: 0, comments: 0
         },
         created_at: `2025-10-${(i % 28) + 1}T08:00:00Z`,
         updated_at: `2025-10-${(i % 28) + 1}T08:00:00Z`,

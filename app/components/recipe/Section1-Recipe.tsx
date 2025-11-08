@@ -1,11 +1,13 @@
 "use client";
+
+import { useState, useEffect } from "react";
 import { FaShareAlt, FaBookmark, FaStar } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import Image from "next/image";
-import { db } from "@/app/api/_mockdb"; // ✅ import data trực tiếp
+import { db } from "@/app/api/_mockdb";
 
 export default function Section1Recipe({ recipeId = 1 }: { recipeId?: number }) {
-  // 🔹 Lấy công thức theo ID (mặc định lấy ID = 1)
+  // 🔹 Lấy công thức theo ID
   const recipe = db.recipes.find((r) => r.recipe_id === recipeId);
 
   if (!recipe) {
@@ -14,12 +16,32 @@ export default function Section1Recipe({ recipeId = 1 }: { recipeId?: number }) 
 
   // 🔹 Lấy thông tin tác giả
   const author = db.users.find((u) => u.user_id === recipe.author_id);
-
   const authorData = {
     name: author?.full_name || "Ẩn danh",
     avatar: author?.avatar_url || "/avatarTruongHop.jpg",
     date: new Date(recipe.created_at).toLocaleDateString("vi-VN"),
   };
+
+  // 🔹 State cho comment count (dữ liệu động)
+  const [commentCount, setCommentCount] = useState<number>(recipe.stats.comments || 0);
+
+  // 🟢 Fetch tổng comment từ API (bao gồm cả reply)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`/api/comments/recipe/${recipe.recipe_id}`, {
+          cache: "no-store",
+        });
+        const data = await res.json();
+
+        // ✅ API trả { total, comments: [] }
+        const total = data?.total ?? (Array.isArray(data) ? data.length : 0);
+        setCommentCount(total);
+      } catch (err) {
+        console.error("❌ Lỗi tải tổng comment:", err);
+      }
+    })();
+  }, [recipe.recipe_id]);
 
   const stats = recipe.stats;
 
@@ -53,9 +75,11 @@ export default function Section1Recipe({ recipeId = 1 }: { recipeId?: number }) 
         />
         <span className="font-medium">{authorData.name}</span>
         <span className="text-gray-500">• {authorData.date}</span>
-        <span className="text-gray-500">• {stats.comments} comments</span>
 
-        {/* Rating */}
+        {/* ✅ Hiển thị comment thật */}
+        <span className="text-gray-500">• {commentCount} comments</span>
+
+        {/* ⭐ Rating */}
         <div className="flex text-orange-500 ml-2">
           {Array(stats.rating)
             .fill(0)

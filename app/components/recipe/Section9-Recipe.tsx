@@ -33,16 +33,26 @@ export default function Section9RecipeComments({ contentId }: { contentId: numbe
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/comments/${contentType}/${contentId}`);
+        const res = await fetch(`/api/comments/${contentType}/${contentId}`, {
+          cache: "no-store",
+        });
         if (!res.ok) throw new Error("Không thể tải bình luận");
+
         const data = await res.json();
-        setComments(data);
+
+        // ✅ Nếu API trả object { total, comments }, lấy phần mảng ra
+        const list = Array.isArray(data) ? data : data.comments || [];
+
+        setComments(list);
       } catch (err) {
-        console.error(err);
+        console.error("❌ Lỗi tải bình luận:", err);
+        setComments([]); // fallback tránh crash
       }
     };
+
     fetchComments();
   }, [contentId, contentType]);
+
 
   // ✅ Comment cha (parent)
   const rootComments = useMemo(
@@ -271,9 +281,8 @@ function CommentItem({
           {/* ❤️ Like */}
           <button
             onClick={handleToggleLike}
-            className={`flex items-center gap-1 transition ${
-              liked ? "text-red-500" : "hover:text-orange-500"
-            }`}
+            className={`flex items-center gap-1 transition ${liked ? "text-red-500" : "hover:text-orange-500"
+              }`}
           >
             <FaHeart size={13} />
             {likeCount}

@@ -56,11 +56,17 @@ export default function PostCard({ blog }: { blog: Blog }) {
       const likeData = await likeRes.json();
       const cmtData = await cmtRes.json();
 
+      // ✅ Đếm tất cả comment (bao gồm reply)
+      const totalComments = Array.isArray(cmtData)
+        ? cmtData.filter((c: any) => c.content_id === data.blog_id).length
+        : 0;
+
       setStats({
         views: blog.stats?.views || 0,
         likes: likeData.count || 0,
-        comments: cmtData.length || 0,
+        comments: cmtData.total || cmtData.comments?.length || 0, // ✅ lấy tổng thực
       });
+
 
       // Kiểm tra user đã like chưa
       if (user && likeData.likes?.some((l: any) => l.user_id === user.user_id)) {
@@ -72,6 +78,7 @@ export default function PostCard({ blog }: { blog: Blog }) {
       console.error("❌ Lỗi tải thống kê:", err);
     }
   }, [data.blog_id, user, blog.stats?.views]);
+
 
   // 📦 Tải 1 lần khi mount + khi user thay đổi
   useEffect(() => {
@@ -177,11 +184,10 @@ export default function PostCard({ blog }: { blog: Blog }) {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         <button
           onClick={handleLike}
-          className={`px-3 py-1 rounded-full transition ${
-            liked
-              ? "bg-pink-100 text-pink-600"
-              : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200"
-          }`}
+          className={`px-3 py-1 rounded-full transition ${liked
+            ? "bg-pink-100 text-pink-600"
+            : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200"
+            }`}
         >
           {liked ? "💖 Đã thích" : "🤍 Thích"} · {stats.likes}
         </button>
@@ -219,6 +225,7 @@ export default function PostCard({ blog }: { blog: Blog }) {
       {showCmt && (
         <CommentSection
           contentId={data.blog_id}
+          contentType="blog"        // ✅ thêm dòng này
           onCount={(n) =>
             setStats((prev) => ({
               ...prev,
@@ -226,6 +233,7 @@ export default function PostCard({ blog }: { blog: Blog }) {
             }))
           }
         />
+
       )}
 
       {/* ✏️ Modal sửa bài */}

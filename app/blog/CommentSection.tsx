@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { FaReply, FaHeart, FaEllipsisH } from "react-icons/fa";
 import { useAuth } from "@/app/contexts/AuthContext";
 
@@ -18,29 +17,36 @@ interface Comment {
 
 export default function CommentSection({
   contentId,
+  contentType, // ✅ nhận rõ ràng từ component cha
   onCount,
 }: {
   contentId: number;
+  contentType: "recipe" | "blog";
   onCount?: (n: number) => void;
 }) {
   const { user } = useAuth();
-  const pathname = usePathname();
-  const contentType: "recipe" | "blog" = pathname.includes("/blog/")
-    ? "blog"
-    : "recipe";
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
   const [newComment, setNewComment] = useState("");
 
+  // 🟢 Load comment
   const load = async () => {
-    const res = await fetch(`/api/comments/${contentType}/${contentId}`, {
-      cache: "no-store",
-    });
-    const data = await res.json();
-    setComments(data);
-    onCount?.(data.length);
+    try {
+      const res = await fetch(`/api/comments/${contentType}/${contentId}`, {
+        cache: "no-store",
+      });
+      const data = await res.json();
+
+      const list = Array.isArray(data) ? data : data.comments || [];
+      setComments(list);
+
+      // ✅ Đếm tổng comment (bao gồm cả reply)
+      onCount?.(data.total || list.length);
+    } catch (error) {
+      console.error("❌ Lỗi tải comment:", error);
+    }
   };
 
   useEffect(() => {
@@ -55,6 +61,7 @@ export default function CommentSection({
   const getReplies = (id: number) =>
     comments.filter((c) => c.parent_id === id);
 
+  // 🟡 Gửi comment hoặc reply
   const sendComment = async (text: string, parent_id: number | null = null) => {
     if (!text.trim()) return;
     if (!user) return alert("⚠️ Bạn cần đăng nhập!");
@@ -84,7 +91,9 @@ export default function CommentSection({
     <section className="mt-10 border-t border-gray-200 pt-6">
       <h2 className="text-xl font-semibold mb-6">
         Bình luận{" "}
-        <span className="text-gray-500 text-base">({comments.length})</span>
+        <span className="text-gray-500 text-base">
+          ({comments.length})
+        </span>
       </h2>
 
       {rootComments.length === 0 && (
@@ -101,6 +110,7 @@ export default function CommentSection({
               }
             />
 
+            {/* Ô nhập phản hồi */}
             {replyTo === c.comment_id && (
               <div className="ml-14 mt-3">
                 <textarea
@@ -118,6 +128,7 @@ export default function CommentSection({
               </div>
             )}
 
+            {/* Hiển thị reply */}
             {getReplies(c.comment_id).length > 0 && (
               <div className="mt-4 ml-10 border-l-2 border-gray-100 pl-6">
                 {getReplies(c.comment_id).map((r) => (
@@ -129,7 +140,7 @@ export default function CommentSection({
         ))}
       </div>
 
-      {/* Ô nhập bình luận mới */}
+      {/* Ô nhập comment mới */}
       <div className="mt-10 border-t border-gray-200 pt-10">
         <h3 className="text-lg font-semibold mb-3">Viết bình luận mới</h3>
         <textarea
@@ -152,7 +163,7 @@ export default function CommentSection({
   );
 }
 
-/* Sub component */
+/* 🧩 Sub component: CommentItem */
 function CommentItem({
   comment,
   onReplyClick,
