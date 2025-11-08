@@ -4,6 +4,7 @@ import { Like } from "../types/like"
 import { Blog } from "../types/blog"
 import { Recipe } from "../types/recipe"
 import { User } from "../types/user"
+import { Friend } from "../types/friend"
 
 
 interface DB {
@@ -13,6 +14,7 @@ interface DB {
   comments: Comment[]
   likes: Like[]
   categories: Category[]
+  friends: Friend[]
 }
 
 // ⚡ Đây là "database trong RAM" — dữ liệu dùng chung toàn app
@@ -211,12 +213,12 @@ export const db: DB = {
     },
     {
       user_id: 3,
-      username: "linh",
-      full_name: "Nguyen Thi Linh",
-      email: "linh@example.com",
-      password_hash: "654321",
-      avatar_url: "https://i.pravatar.cc/150?img=3",
-      bio: "Yêu thích ẩm thực chay và sáng tạo món ăn mới 🌿",
+      username: "hop",
+      full_name: "Trương Quang Hợp",
+      email: "hop@example.com",
+      password_hash: "123456",
+      avatar_url: "https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/569027122_1366489414860667_5332184198451005686_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHdwmv427kS2s8nVfby9i5lgS22TXXFNjWBLbZNdcU2NYuU1oMmTL3YXnkCSEJTUBPQ5NKd_GLnDPhWwRfhhQsj&_nc_ohc=uPqLII6HrpUQ7kNvwEdVLfz&_nc_oc=AdmRXIR2QJTLVVxElComvKTQyFCEFYMc6j8gga0vcxS9uy1stvHyjwo5k7B7GumWiF8&_nc_zt=23&_nc_ht=scontent.fhan14-1.fna&_nc_gid=M3sKlAJ6sRmG3dM7Lx0-vg&oh=00_AfgWOHIDnZYfZfmV1zQAr9XTVHnJLHzGpvhAlSaqeue9JQ&oe=6914788A",
+      bio: "1 ngày có 50h anh sẽ dành 26h bên em ❤",
       role: "user",
       email_verified: 1,
       is_active: 1,
@@ -225,12 +227,12 @@ export const db: DB = {
     },
     {
       user_id: 4,
-      username: "hoang",
-      full_name: "Le Van Hoang",
+      username: "tai",
+      full_name: "Hoàng Văn Tài",
       email: "hoang@example.com",
       password_hash: "123456",
-      avatar_url: "https://i.pravatar.cc/150?img=4",
-      bio: "Chuyên gia BBQ và món nướng ngoài trời 🍖",
+      avatar_url: "https://scontent.fhan14-4.fna.fbcdn.net/v/t39.30808-1/540005698_1821192685488065_720899589459030070_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=102&ccb=1-7&_nc_sid=1d2534&_nc_eui2=AeEsFJKoHS8VC82JXFbaIjXr0ogzfp7AqeHSiDN-nsCp4brgybDILotrTs7ct9mVQW4ZxUzZdkewsZgo1MyIpWVn&_nc_ohc=IzNchenfNcsQ7kNvwGvdzK4&_nc_oc=AdkZv_QnabFi0Ht3GS2A4HUA8ltcHCZtP_24XgZ0QQR9gLswMcuSMALvLAx7Esz7WyU&_nc_zt=24&_nc_ht=scontent.fhan14-4.fna&_nc_gid=484WOqOivekT_jKtdqXOWA&oh=00_AfgHKVLF0ggGzSoefiRqfTfGf-OIHFu_CEScePGFDHivfw&oe=69145D7E",
+      bio: "Chuyên gia Backend",
       role: "moderator",
       email_verified: 1,
       is_active: 1,
@@ -239,11 +241,11 @@ export const db: DB = {
     },
     {
       user_id: 5,
-      username: "huong",
-      full_name: "Pham Thi Huong",
-      email: "huong@example.com",
-      password_hash: "111111",
-      avatar_url: "https://i.pravatar.cc/150?img=5",
+      username: "quan",
+      full_name: "Hà Văn Quân",
+      email: "quan@example.com",
+      password_hash: "123456",
+      avatar_url: "https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/480780192_1823274091836767_8968456450236725049_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEcYux19IMePaMgk2Ww_uUJcUizfOhzZTtxSLN86HNlO-jgpBk6AL0VNwey7j5xjsgRJgzbFGnW3h7pwG3cPPpx&_nc_ohc=4uaC1GwWGkIQ7kNvwEMcLMX&_nc_oc=AdkY36M7V1dF7P66A70UcXsuedaIEYBO2IcEIydOQFT5PI1P4JGOex3rEjjuHF4FmLs&_nc_zt=23&_nc_ht=scontent.fhan14-1.fna&_nc_gid=3nhg-7yOmGgKPJQApjrsBg&oh=00_AfjdeNCd9yd7T9GAB8QOl5glZSyYKxbFTiNZLSWaLDPWoQ&oe=691477BD",
       bio: "Mê nấu chè và đồ ngọt Việt Nam 🍮",
       role: "user",
       email_verified: 0,
@@ -974,5 +976,67 @@ export const db: DB = {
     },
   ],
 
+  friends: [
+  { id: 1, user_id: 1, friend_id: 2, created_at: "2024-12-01T08:00:00.000Z", status: "accepted" },
+  { id: 2, user_id: 1, friend_id: 3, created_at: "2024-12-02T08:00:00.000Z", status: "accepted" },
+  { id: 3, user_id: 1, friend_id: 4, created_at: "2024-12-03T08:00:00.000Z", status: "pending" },
+  { id: 4, user_id: 1, friend_id: 5, created_at: "2024-12-04T08:00:00.000Z", status: "accepted" },
+  { id: 5, user_id: 1, friend_id: 6, created_at: "2024-12-05T08:00:00.000Z", status: "accepted" },
+  { id: 6, user_id: 1, friend_id: 7, created_at: "2024-12-06T08:00:00.000Z", status: "accepted" },
+  { id: 7, user_id: 1, friend_id: 8, created_at: "2024-12-07T08:00:00.000Z", status: "pending" },
+  { id: 8, user_id: 1, friend_id: 9, created_at: "2024-12-08T08:00:00.000Z", status: "accepted" },
+  { id: 9, user_id: 1, friend_id: 10, created_at: "2024-12-09T08:00:00.000Z", status: "accepted" },
+
+  { id: 10, user_id: 2, friend_id: 3, created_at: "2024-12-10T08:00:00.000Z", status: "accepted" },
+  { id: 11, user_id: 2, friend_id: 4, created_at: "2024-12-11T08:00:00.000Z", status: "pending" },
+  { id: 12, user_id: 2, friend_id: 5, created_at: "2024-12-12T08:00:00.000Z", status: "accepted" },
+  { id: 13, user_id: 2, friend_id: 6, created_at: "2024-12-13T08:00:00.000Z", status: "accepted" },
+  { id: 14, user_id: 2, friend_id: 7, created_at: "2024-12-14T08:00:00.000Z", status: "pending" },
+  { id: 15, user_id: 2, friend_id: 8, created_at: "2024-12-15T08:00:00.000Z", status: "accepted" },
+  { id: 16, user_id: 2, friend_id: 9, created_at: "2024-12-16T08:00:00.000Z", status: "accepted" },
+  { id: 17, user_id: 2, friend_id: 10, created_at: "2024-12-17T08:00:00.000Z", status: "accepted" },
+
+  { id: 18, user_id: 3, friend_id: 4, created_at: "2024-12-18T08:00:00.000Z", status: "accepted" },
+  { id: 19, user_id: 3, friend_id: 5, created_at: "2024-12-19T08:00:00.000Z", status: "accepted" },
+  { id: 20, user_id: 3, friend_id: 6, created_at: "2024-12-20T08:00:00.000Z", status: "pending" },
+  { id: 21, user_id: 3, friend_id: 7, created_at: "2024-12-21T08:00:00.000Z", status: "accepted" },
+  { id: 22, user_id: 3, friend_id: 8, created_at: "2024-12-22T08:00:00.000Z", status: "accepted" },
+  { id: 23, user_id: 3, friend_id: 9, created_at: "2024-12-23T08:00:00.000Z", status: "accepted" },
+  { id: 24, user_id: 3, friend_id: 10, created_at: "2024-12-24T08:00:00.000Z", status: "pending" },
+
+  { id: 25, user_id: 4, friend_id: 5, created_at: "2024-12-25T08:00:00.000Z", status: "accepted" },
+  { id: 26, user_id: 4, friend_id: 6, created_at: "2024-12-26T08:00:00.000Z", status: "accepted" },
+  { id: 27, user_id: 4, friend_id: 7, created_at: "2024-12-27T08:00:00.000Z", status: "pending" },
+  { id: 28, user_id: 4, friend_id: 8, created_at: "2024-12-28T08:00:00.000Z", status: "accepted" },
+  { id: 29, user_id: 4, friend_id: 9, created_at: "2024-12-29T08:00:00.000Z", status: "accepted" },
+  { id: 30, user_id: 4, friend_id: 10, created_at: "2024-12-30T08:00:00.000Z", status: "pending" },
+
+  { id: 31, user_id: 5, friend_id: 6, created_at: "2025-01-01T08:00:00.000Z", status: "accepted" },
+  { id: 32, user_id: 5, friend_id: 7, created_at: "2025-01-02T08:00:00.000Z", status: "accepted" },
+  { id: 33, user_id: 5, friend_id: 8, created_at: "2025-01-03T08:00:00.000Z", status: "accepted" },
+  { id: 34, user_id: 5, friend_id: 9, created_at: "2025-01-04T08:00:00.000Z", status: "pending" },
+  { id: 35, user_id: 5, friend_id: 10, created_at: "2025-01-05T08:00:00.000Z", status: "accepted" },
+
+  { id: 36, user_id: 6, friend_id: 7, created_at: "2025-01-06T08:00:00.000Z", status: "accepted" },
+  { id: 37, user_id: 6, friend_id: 8, created_at: "2025-01-07T08:00:00.000Z", status: "accepted" },
+  { id: 38, user_id: 6, friend_id: 9, created_at: "2025-01-08T08:00:00.000Z", status: "accepted" },
+  { id: 39, user_id: 6, friend_id: 10, created_at: "2025-01-09T08:00:00.000Z", status: "pending" },
+
+  { id: 40, user_id: 7, friend_id: 8, created_at: "2025-01-10T08:00:00.000Z", status: "accepted" },
+  { id: 41, user_id: 7, friend_id: 9, created_at: "2025-01-11T08:00:00.000Z", status: "accepted" },
+  { id: 42, user_id: 7, friend_id: 10, created_at: "2025-01-12T08:00:00.000Z", status: "pending" },
+
+  { id: 43, user_id: 8, friend_id: 9, created_at: "2025-01-13T08:00:00.000Z", status: "accepted" },
+  { id: 44, user_id: 8, friend_id: 10, created_at: "2025-01-14T08:00:00.000Z", status: "accepted" },
+
+  { id: 45, user_id: 9, friend_id: 10, created_at: "2025-01-15T08:00:00.000Z", status: "accepted" },
+
+  // thêm vài quan hệ chéo để cho vui
+  { id: 46, user_id: 2, friend_id: 1, created_at: "2025-01-16T08:00:00.000Z", status: "accepted" },
+  { id: 47, user_id: 3, friend_id: 2, created_at: "2025-01-17T08:00:00.000Z", status: "accepted" },
+  { id: 48, user_id: 4, friend_id: 1, created_at: "2025-01-18T08:00:00.000Z", status: "pending" },
+  { id: 49, user_id: 5, friend_id: 2, created_at: "2025-01-19T08:00:00.000Z", status: "accepted" },
+  { id: 50, user_id: 6, friend_id: 3, created_at: "2025-01-20T08:00:00.000Z", status: "accepted" },
+],
 
 }
