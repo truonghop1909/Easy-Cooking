@@ -22,7 +22,7 @@ export default function CategoriesPage() {
         Categories
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 justify-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
         {categories.map((cat) => (
           <Link key={cat.slug} href={`/categories/${cat.slug}`}>
             <CategoryItem name={cat.name} image={cat.image_url} />
